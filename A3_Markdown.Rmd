@@ -1,0 +1,125 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Project Info - Assignment 3
+Nadejda Boev (20056079)
+Due Date - 2022/01/26
+Github - https://github.com/16nbb1/Biol432_A3
+
+### Data Input and libraries
+Loading in libraries I'll Needd
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(stringr)
+
+```
+
+Loading in dataset
+
+```{r}
+(df = read.csv("./InputData/FallopiaData.csv"))
+```
+
+### Data Wrangling
+
+1. Removing rows with ‘Total’ biomass < 60
+* Filtering for rows that have a biomass of 60 or less
+2. Make a new column TotalG, which converts the ‘Total’ column from mg to grams AND replace Total with TotalG, and add it to the dataset.
+* Removing Total using NULL 
+3. Reorder the columns so that they are in the order: ‘TotalG’, ‘Taxon’, ‘Senario’, ‘Nutrients’ AND Remove the other columns
+
+NEEED TO DOUBLE CHECK MG VS G
+
+```{r}
+df_filt = df %>% 
+  filter(Total <= 60) %>% 
+  mutate(TotalG = Total / 1000, Total = NULL) %>% 
+  select(TotalG, Taxon, Scenario, Nutrients) 
+```
+
+### Function: Basic Stats
+
+Input: 
+* A vector of data to process (e.g. column from a data.frame object) 
+* A string that defines what calculation to perform.
+  * Options: "Average", "Sum", "Observations"
+  * All other inputs recieve the following message: "ERROR input"
+
+Output: 
+* 
+
+o	Write some R code that uses your function to count the total number of observations in the 'Taxon' column.
+o	Write some R code that uses your function  to calculate the average TotalG for each of the two Nutrient concentrations.
+
+
+```{r}
+basics <- function (in_comm, in_vec, datafram) {
+
+  if(in_comm == 'Average') {
+    print(paste0('Average: ', mean(in_vec, na.rm=T)))
+  } else if (in_comm == 'Sum') {
+    print(paste0('Sum: ', sum(in_vec, na.rm=T)))
+  } else if (in_comm == 'Observations') {
+    print(paste0('Number of observations: ',length(in_vec)))
+  } else {
+    print('INPUT ERROR')
+  }
+  
+  if(any(str_detect(names(datafram), "Taxon")) == TRUE) {
+    print(paste0('Number of observations in Taxon column: ',length(datafram$Taxon)))
+  } else {
+    print('ERROR : No taxon column')
+  }
+    
+  if(any(str_detect(names(datafram), "TotalG")) == TRUE) {
+      groupby_nut = datafram %>% 
+      group_by(Nutrients) %>% 
+      summarize(Mean = mean(TotalG))
+      
+      print(paste0('Average biomass for high nutrients:  ', signif(groupby_nut[groupby_nut$Nutrients == 'high',]$Mean, digits = 3), 'g'))
+      print(paste0('Average biomass for low nutrients:  ', signif(groupby_nut[groupby_nut$Nutrients == 'low',]$Mean, digits = 3), 'g'))
+ 
+     } else {
+    print('ERROR : No TotalG column')
+  }
+
+
+  
+}
+
+```
+
+Testing inputs
+
+Successful cases : 
+
+```{r}
+basics('Average', df_filt$TotalG,  df_filt)
+basics('Sum', df_filt$TotalG,  df_filt)
+basics('Observations', df_filt$TotalG,  df_filt)
+
+```
+
+Other cases : 
+
+```{r}
+# Spelling error
+basics('Observaions', df_filt$TotalG,  df_filt)
+
+# Throwing error when wrong dataaframe is used (df does not have a TotalG column)
+basics('Observations', df_filt$TotalG,  df)
+```
+
+Saving the "clean" dataset
+
+```{r}
+write.csv(df_filt,"./Output/FallopiaData_60less.csv")
+```
+
+
+
