@@ -6,20 +6,20 @@ output: html_notebook
 ## Project Info - Assignment 3
 Nadejda Boev (20056079)
 Due Date - 2022/01/26
-Github - https://github.com/16nbb1/Biol432_A3
+Github user - 16nbb1
+Github link - https://github.com/16nbb1/Biol432_A3
 
 ### Data Input and libraries
-Loading in libraries I'll Needd
+Loading in libraries I'll Need
 
 ```{r}
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
 library(stringr)
-
 ```
 
-Loading in dataset
+Loading in dataset with a relative path
 
 ```{r}
 (df = read.csv("./InputData/FallopiaData.csv"))
@@ -31,9 +31,8 @@ Loading in dataset
 * Filtering for rows that have a biomass of 60 or less
 2. Make a new column TotalG, which converts the ‘Total’ column from mg to grams AND replace Total with TotalG, and add it to the dataset.
 * Removing Total using NULL 
-3. Reorder the columns so that they are in the order: ‘TotalG’, ‘Taxon’, ‘Senario’, ‘Nutrients’ AND Remove the other columns
+3. Reorder the columns so that they are in the order: ‘TotalG’, ‘Taxon’, ‘Scenario’, ‘Nutrients’ AND Remove the other columns
 
-NEEED TO DOUBLE CHECK MG VS G
 
 ```{r}
 df_filt = df %>% 
@@ -42,24 +41,24 @@ df_filt = df %>%
   select(TotalG, Taxon, Scenario, Nutrients) 
 ```
 
-### Function: Basic Stats
+### Function: basics
 
 Input: 
 * A vector of data to process (e.g. column from a data.frame object) 
 * A string that defines what calculation to perform.
   * Options: "Average", "Sum", "Observations"
-  * All other inputs recieve the following message: "ERROR input"
+  * All other inputs receive the following message: "ERROR input"
 
 Output: 
-* 
-
-o	Write some R code that uses your function to count the total number of observations in the 'Taxon' column.
-o	Write some R code that uses your function  to calculate the average TotalG for each of the two Nutrient concentrations.
-
+* Based on the above command, perform the command with the column provided
+* Count the total number of observations in the 'Taxon' column ONLY IF a Taxon column exists
+* Calculate the average TotalG for each of the two Nutrient concentrations ONLY IF a TotalG column exits
+* Return an error messages if input string does not perfectly match or if columns required do not exist in the dataframe provided
 
 ```{r}
 basics <- function (in_comm, in_vec, datafram) {
 
+  # IF statement based on command, includes the possibility for NA is columns  
   if(in_comm == 'Average') {
     print(paste0('Average: ', mean(in_vec, na.rm=T)))
   } else if (in_comm == 'Sum') {
@@ -70,17 +69,20 @@ basics <- function (in_comm, in_vec, datafram) {
     print('INPUT ERROR')
   }
   
+  # IF statement for counting number of Taxon observations, if this column exists
   if(any(str_detect(names(datafram), "Taxon")) == TRUE) {
     print(paste0('Number of observations in Taxon column: ',length(datafram$Taxon)))
   } else {
     print('ERROR : No taxon column')
   }
     
+    # IF statement for for groupby average by nutrient, the column TotalG must exist
   if(any(str_detect(names(datafram), "TotalG")) == TRUE) {
       groupby_nut = datafram %>% 
       group_by(Nutrients) %>% 
       summarize(Mean = mean(TotalG))
       
+      # Printing out each average (low and high nutrients) 
       print(paste0('Average biomass for high nutrients:  ', signif(groupby_nut[groupby_nut$Nutrients == 'high',]$Mean, digits = 3), 'g'))
       print(paste0('Average biomass for low nutrients:  ', signif(groupby_nut[groupby_nut$Nutrients == 'low',]$Mean, digits = 3), 'g'))
  
@@ -88,37 +90,34 @@ basics <- function (in_comm, in_vec, datafram) {
     print('ERROR : No TotalG column')
   }
 
-
   
 }
 
 ```
 
-Testing inputs
+### Testing inputs
 
-Successful cases : 
-
+Successful cases
 ```{r}
 basics('Average', df_filt$TotalG,  df_filt)
 basics('Sum', df_filt$TotalG,  df_filt)
 basics('Observations', df_filt$TotalG,  df_filt)
-
 ```
 
-Other cases : 
+Other cases 
 
 ```{r}
 # Spelling error
 basics('Observaions', df_filt$TotalG,  df_filt)
 
-# Throwing error when wrong dataaframe is used (df does not have a TotalG column)
+# Throwing error when wrong dataframe is used (df does not have a TotalG column)
 basics('Observations', df_filt$TotalG,  df)
 ```
 
-Saving the "clean" dataset
+### Saving the "clean" dataset
 
 ```{r}
-write.csv(df_filt,"./Output/FallopiaData_60less.csv")
+write.csv(df_filt,"./Output/WrangledData.csv")
 ```
 
 
