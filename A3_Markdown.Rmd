@@ -1,13 +1,12 @@
 ---
-title: "R Notebook"
+title: "Project Info - Assignment 3"
 output: html_notebook
 ---
 
-## Project Info - Assignment 3
-Nadejda Boev (20056079)
-Due Date - 2022/01/26
-Github user - 16nbb1
-Github link - https://github.com/16nbb1/Biol432_A3
+* Nadejda Boev (20056079)
+* Due Date - 2022/01/26
+* Github user - 16nbb1
+* Github link - https://github.com/16nbb1/Biol432_A3
 
 ### Data Input and libraries
 Loading in libraries I'll Need
@@ -44,12 +43,14 @@ df_filt = df %>%
 ### Function: basics
 
 Input: 
+
 * A vector of data to process (e.g. column from a data.frame object) 
 * A string that defines what calculation to perform.
   * Options: "Average", "Sum", "Observations"
   * All other inputs receive the following message: "ERROR input"
 
 Output: 
+
 * Based on the above command, perform the command with the column provided
 * Count the total number of observations in the 'Taxon' column ONLY IF a Taxon column exists
 * Calculate the average TotalG for each of the two Nutrient concentrations ONLY IF a TotalG column exits
